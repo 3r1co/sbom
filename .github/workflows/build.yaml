@@ -1,0 +1,56 @@
+name: Build and Analyze SBOM
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  generate-sbom:
+    name: Generate SBOM and Build Docker Image
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Checkout the code
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Step 2: Set up Node.js
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+
+    # Step 3: Install dependencies
+    - name: Install NPM dependencies
+      run: npm install
+
+    # Step 4: Generate SBOM for JavaScript dependencies using CycloneDX
+    - name: Generate SBOM for JavaScript project
+      run: |
+        npx @cyclonedx/bom -o sbom-js-project.json
+
+    # Step 5: Build Docker image
+    - name: Build Docker Image
+      run: |
+        docker build -t my-node-app:latest .
+
+    # Step 6: Generate SBOM for Docker image using Anchore's SBOM Action
+    - name: Generate SBOM for Docker image
+      uses: anchore/sbom-action@v0
+      with:
+        image: my-node-app:latest
+        format: json
+        artifact-name: sbom-docker-image.json
+
+    # Step 7: Upload SBOMs as artifacts
+    - name: Upload SBOMs
+      uses: actions/upload-artifact@v3
+      with:
+        name: sbom-artifacts
+        path: |
+          sbom-js-project.json
+          sbom-docker-image.json
