@@ -33,7 +33,7 @@ jobs:
       uses: anchore/sbom-action@v0
       with:
         format: json
-        artifact-name: sbom-docker-image.json
+        artifact-name: sbom-node-js.json
 
     # Step 5: Build Docker image
     - name: Build Docker Image
@@ -54,5 +54,5 @@ jobs:
       with:
         name: sbom-artifacts
         path: |
-          sbom-js-project.json
+          sbom-node-js.json
           sbom-docker-image.json
