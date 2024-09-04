@@ -28,10 +28,12 @@ jobs:
     - name: Install NPM dependencies
       run: npm install
 
-    # Step 4: Generate SBOM for JavaScript dependencies using CycloneDX
-    - name: Generate SBOM for JavaScript project
-      run: |
-        npx @cyclonedx/bom -o sbom-js-project.json
+    # Step 6: Generate SBOM for Javascript using Anchore's SBOM Action
+    - name: Generate SBOM for Docker image
+      uses: anchore/sbom-action@v0
+      with:
+        format: json
+        artifact-name: sbom-docker-image.json
 
     # Step 5: Build Docker image
     - name: Build Docker Image
