@@ -43,7 +43,7 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
         registry: docker.io
         repository: 3r1co/cd
-        tag_with_sha: true
+        tags: ${{ github.sha }}
 
     # Step 6: Generate SBOM for Docker image using Anchore's SBOM Action
     - name: Generate SBOM for Docker image
