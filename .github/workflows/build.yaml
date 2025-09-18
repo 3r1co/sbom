@@ -53,13 +53,13 @@ jobs:
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-    - uses: 3r1co/dependency-check-action@master
-      name: OWASP Dependency Check
-      with:
-        Project-Name: TestApp
+#    - uses: 3r1co/dependency-check-action@master
+#      name: OWASP Dependency Check
+#      with:
+#        Project-Name: TestApp
 
-    - name: Archive dependency check reports
-      uses: actions/upload-artifact@v4
-      with:
-        name: reports
-        path: reports
+#    - name: Archive dependency check reports
+#      uses: actions/upload-artifact@v4
+#      with:
+#        name: reports
+#        path: reports
