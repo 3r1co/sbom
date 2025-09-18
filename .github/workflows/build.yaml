@@ -52,3 +52,14 @@ jobs:
       uses: SonarSource/sonarqube-scan-action@v5.3.1 # Ex: v4.1.0 or sha1, See the latest version at https://github.com/marketplace/actions/official-sonarqube-scan
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+    - uses: sburris/dependency-check-action@master
+      name: OWASP Dependency Check
+      with:
+        Project-Name: TestApp
+
+    - name: Archive dependency check reports
+      uses: actions/upload-artifact@v1
+      with:
+        name: reports
+        path: reports
