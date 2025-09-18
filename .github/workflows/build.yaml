@@ -49,7 +49,7 @@ jobs:
     - name: Generate SBOM for Docker image
       uses: anchore/sbom-action@v0
       with:
-        image: my-node-app:latest
+        image: 3r1co/cd:${{ github.sha }}
         format: spdx-json
         artifact-name: sbom-docker-image.json
 
