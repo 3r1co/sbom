@@ -42,14 +42,14 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
         registry: docker.io
-        repository: 3r1co/cd
+        repository: ${{ secrets.DOCKER_USERNAME }}/cd
         tags: ${{ github.sha }}
 
     # Step 6: Generate SBOM for Docker image using Anchore's SBOM Action
     - name: Generate SBOM for Docker image
       uses: anchore/sbom-action@v0
       with:
-        image: 3r1co/cd:${{ github.sha }}
+        image: ${{ secrets.DOCKER_USERNAME }}/cd:${{ github.sha }}
         format: spdx-json
         artifact-name: sbom-docker-image.json
 
@@ -61,7 +61,7 @@ jobs:
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@master
       with:
-        image-ref: 'docker.io/3r1co/cd:${{ github.sha }}'
+        image-ref: 'docker.io/${{ secrets.DOCKER_USERNAME }}/cd:${{ github.sha }}'
         format: 'table'
         exit-code: '1'
         ignore-unfixed: true
