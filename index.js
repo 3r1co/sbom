@@ -7,7 +7,7 @@ const port = 3000;
 
 // A simple route that responds with "Hello, World!"
 app.get('/', (req, res) => {
-  res.send('Hello, World!');
+  res.send('Hello, World 2025!');
 });
 
 // Example of using lodash (an outdated dependency)
