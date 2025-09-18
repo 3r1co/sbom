@@ -9,7 +9,41 @@ on:
       - main
 
 jobs:
-  generate-sbom:
+  build-image:
+    name: Build Image, Run Trivy, Generate Image SBOM
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Checkout the code
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Build and Push Docker Image
+      uses: docker/build-push-action@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        registry: docker.io
+        repository: ${{ secrets.DOCKER_USERNAME }}/cd
+        tags: ${{ github.sha }}
+
+    # Step 6: Generate SBOM for Docker image using Anchore's SBOM Action
+    - name: Generate SBOM for Docker image
+      uses: anchore/sbom-action@v0
+      with:
+        image: ${{ secrets.DOCKER_USERNAME }}/cd:${{ github.sha }}
+        format: spdx-json
+        artifact-name: sbom-docker-image.json
+
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'docker.io/${{ secrets.DOCKER_USERNAME }}/cd:${{ github.sha }}'
+        format: 'table'
+        exit-code: '1'
+        ignore-unfixed: false
+        vuln-type: 'os,library'
+        severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
+    
+  generate-sbom-node:
     name: Generate SBOM and Build Docker Image
     runs-on: ubuntu-latest
 
@@ -29,44 +63,17 @@ jobs:
       run: npm install
 
     # Step 6: Generate SBOM for Javascript using Anchore's SBOM Action
-    - name: Generate SBOM for Docker image
+    - name: Generate SBOM for Javascript
       uses: anchore/sbom-action@v0
       with:
         format: spdx-json
         artifact-name: sbom-node-js.json
 
     # Step 5: Build Docker image
-    - name: build-push
-      uses: docker/build-push-action@v1
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-        registry: docker.io
-        repository: ${{ secrets.DOCKER_USERNAME }}/cd
-        tags: ${{ github.sha }}
-
-    # Step 6: Generate SBOM for Docker image using Anchore's SBOM Action
-    - name: Generate SBOM for Docker image
-      uses: anchore/sbom-action@v0
-      with:
-        image: ${{ secrets.DOCKER_USERNAME }}/cd:${{ github.sha }}
-        format: spdx-json
-        artifact-name: sbom-docker-image.json
-
     - name: SonarQube Scan
       uses: SonarSource/sonarqube-scan-action@v5.3.1 # Ex: v4.1.0 or sha1, See the latest version at https://github.com/marketplace/actions/official-sonarqube-scan
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-    - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@master
-      with:
-        image-ref: 'docker.io/${{ secrets.DOCKER_USERNAME }}/cd:${{ github.sha }}'
-        format: 'table'
-        exit-code: '1'
-        ignore-unfixed: false
-        vuln-type: 'os,library'
-        severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
 
 #    - uses: 3r1co/dependency-check-action@master
 #      name: OWASP Dependency Check
