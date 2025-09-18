@@ -7,17 +7,6 @@ const port = 3000;
 
 // A simple route that responds with "Hello, World!"
 app.get('/', (req, res) => {
-  const userInput = req.url.substring(1); 
-  // BAD PRACTICE: Passing unsanitized input to exec()
-  exec(`ls ${userInput}`, (error, stdout, stderr) => {
-    if (error) {
-      res.writeHead(500, { "Content-Type": "text/plain" });
-      res.end(`Error: ${error.message}`);
-      return;
-    }
-    res.writeHead(200, { "Content-Type": "text/plain" });
-    res.end(stdout);
-  });
   res.send('Hello, World 2025!');
 });
 
@@ -27,6 +16,13 @@ app.get('/lodash-example', (req, res) => {
   const doubled = _.map(numbers, num => num * 2);
   res.send(`Doubled Numbers: ${doubled}`);
 });
+
+function greet(name) {
+  const unused = 42;  // 🚨 SonarQube Warning: "Remove this unused variable."
+  return "Hello " + name;
+}
+
+console.log(greet("Eric"));
 
 // Start the web server
 app.listen(port, () => {
