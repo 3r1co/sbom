@@ -53,7 +53,7 @@ jobs:
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-    - uses: sburris/dependency-check-action@master
+    - uses: 3r1co/dependency-check-action@master
       name: OWASP Dependency Check
       with:
         Project-Name: TestApp
