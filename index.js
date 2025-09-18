@@ -17,13 +17,6 @@ app.get('/lodash-example', (req, res) => {
   res.send(`Doubled Numbers: ${doubled}`);
 });
 
-function greet(name) {
-  const unused = 42;  // 🚨 SonarQube Warning: "Remove this unused variable."
-  return "Hello " + name;
-}
-
-console.log(greet("Eric"));
-
 // Start the web server
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
