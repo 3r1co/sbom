@@ -59,7 +59,7 @@ jobs:
         Project-Name: TestApp
 
     - name: Archive dependency check reports
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         name: reports
         path: reports
