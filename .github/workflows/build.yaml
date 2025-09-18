@@ -9,7 +9,39 @@ on:
       - main
 
 jobs:
-  build-image:
+  nodejs:
+    name: Generate SBOM and run sonarqube scan for Node.JS
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Checkout the code
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # Step 2: Set up Node.js
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+
+    # Step 3: Install dependencies
+    - name: Install NPM dependencies
+      run: npm install
+
+    # Step 6: Generate SBOM for Javascript using Anchore's SBOM Action
+    - name: Generate SBOM for Javascript
+      uses: anchore/sbom-action@v0
+      with:
+        format: spdx-json
+        artifact-name: sbom-node-js.json
+
+    # Step 5: Build Docker image
+    - name: SonarQube Scan
+      uses: SonarSource/sonarqube-scan-action@v5.3.1 # Ex: v4.1.0 or sha1, See the latest version at https://github.com/marketplace/actions/official-sonarqube-scan
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  docker:
     name: Build Image, Run Trivy, Generate Image SBOM
     runs-on: ubuntu-latest
     steps:
@@ -42,38 +74,6 @@ jobs:
         ignore-unfixed: false
         vuln-type: 'os,library'
         severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
-    
-  generate-sbom-node:
-    name: Generate SBOM and Build Docker Image
-    runs-on: ubuntu-latest
-
-    steps:
-    # Step 1: Checkout the code
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    # Step 2: Set up Node.js
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '22'
-
-    # Step 3: Install dependencies
-    - name: Install NPM dependencies
-      run: npm install
-
-    # Step 6: Generate SBOM for Javascript using Anchore's SBOM Action
-    - name: Generate SBOM for Javascript
-      uses: anchore/sbom-action@v0
-      with:
-        format: spdx-json
-        artifact-name: sbom-node-js.json
-
-    # Step 5: Build Docker image
-    - name: SonarQube Scan
-      uses: SonarSource/sonarqube-scan-action@v5.3.1 # Ex: v4.1.0 or sha1, See the latest version at https://github.com/marketplace/actions/official-sonarqube-scan
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
 #    - uses: 3r1co/dependency-check-action@master
 #      name: OWASP Dependency Check
